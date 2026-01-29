@@ -1,0 +1,10 @@
+NAME
+  Slicer::TransformsModuleMRMLDisplayableManager
+LIBRARY_NAME
+  vtkSlicerTransformsModuleMRMLDisplayableManager
+IMPLEMENTABLE
+DEPENDS
+  Slicer::TransformsModuleLogic
+  Slicer::MRMLDisplayableManager
+DESCRIPTION
+  "vtkSlicerTransformsModuleMRMLDisplayableManager"

@@ -1,0 +1,21 @@
+diff --git a/Libs/MRML/Core/vtkMRMLExport.h b/Libs/MRML/Core/vtkMRMLExport.h
+index 830b66179f..fa25b35ff5 100644
+--- a/Libs/MRML/Core/vtkMRMLExport.h
++++ b/Libs/MRML/Core/vtkMRMLExport.h
+@@ -16,15 +16,6 @@
+ #define __vtkMRMLExport_h
+ 
+ #include <vtkMRMLConfigure.h>
+-
+-#if defined(_WIN32) && !defined(VTKMRML_STATIC)
+-# if defined(MRMLCore_EXPORTS)
+-#  define VTK_MRML_EXPORT __declspec(dllexport)
+-# else
+-#  define VTK_MRML_EXPORT __declspec(dllimport)
+-# endif
+-#else
+-# define VTK_MRML_EXPORT
+-#endif
++#include <vtkMRMLCoreModule.h>
+ 
+ #endif

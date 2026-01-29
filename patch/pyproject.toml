@@ -1,0 +1,11 @@
+[build-system]
+requires = ["scikit-build-core", "vtk-sdk==9.6.0.dev0"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+build-dir = "wheelbuild"
+
+[project]
+name = "slicer-core"
+version = "5.10.0"
+dependencies = ["vtk==9.6.0.rc2"]

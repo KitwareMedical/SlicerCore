@@ -1,0 +1,21 @@
+diff --git a/Libs/vtkITK/vtkITKExport.h b/Libs/vtkITK/vtkITKExport.h
+index a278908049..c6fd16c100 100644
+--- a/Libs/vtkITK/vtkITKExport.h
++++ b/Libs/vtkITK/vtkITKExport.h
+@@ -16,15 +16,6 @@
+ #define __vtkITKExport_h
+ 
+ #include <vtkITKConfigure.h>
+-
+-#if defined(_WIN32) && !defined(VTKITK_STATIC)
+-# if defined(vtkITK_EXPORTS)
+-#  define VTK_ITK_EXPORT __declspec(dllexport)
+-# else
+-#  define VTK_ITK_EXPORT __declspec(dllimport)
+-# endif
+-#else
+-# define VTK_ITK_EXPORT
+-#endif
++#include <vtkITKModule.h>
+ 
+ #endif

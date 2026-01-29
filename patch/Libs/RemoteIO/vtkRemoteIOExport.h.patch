@@ -1,0 +1,21 @@
+diff --git a/Libs/RemoteIO/vtkRemoteIOExport.h b/Libs/RemoteIO/vtkRemoteIOExport.h
+index 52175ed505..feddf75641 100644
+--- a/Libs/RemoteIO/vtkRemoteIOExport.h
++++ b/Libs/RemoteIO/vtkRemoteIOExport.h
+@@ -2,15 +2,6 @@
+ #define __vtkRemoteIOExport_h
+ 
+ #include <vtkRemoteIOConfigure.h>
+-
+-#if defined(_WIN32) && !defined(RemoteIO_STATIC)
+-# if defined(RemoteIO_EXPORTS)
+-#  define VTK_RemoteIO_EXPORT __declspec(dllexport)
+-# else
+-#  define VTK_RemoteIO_EXPORT __declspec(dllimport)
+-# endif
+-#else
+-# define VTK_RemoteIO_EXPORT
+-#endif
++#include <vtkRemoteIOModule.h>
+ 
+ #endif
