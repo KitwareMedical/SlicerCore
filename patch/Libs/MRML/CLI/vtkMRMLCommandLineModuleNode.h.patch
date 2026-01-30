@@ -1,0 +1,13 @@
+diff --git a/Libs/MRML/CLI/vtkMRMLCommandLineModuleNode.h b/Libs/MRML/CLI/vtkMRMLCommandLineModuleNode.h
+index 52d418264d..ed294d5f0a 100644
+--- a/Libs/MRML/CLI/vtkMRMLCommandLineModuleNode.h
++++ b/Libs/MRML/CLI/vtkMRMLCommandLineModuleNode.h
+@@ -13,7 +13,7 @@
+ /// MRML includes
+ #include <vtkMRMLNode.h>
+ 
+-#include "vtkMRMLCLIExport.h"
++#include "vtkMRMLCLIModule.h"
+ 
+ class ModuleDescription;
+ 

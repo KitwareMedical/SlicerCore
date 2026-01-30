@@ -1,37 +1,66 @@
 name: Python CI
 
 on:
-  pull_request: 
+  pull_request:
     branches:  [ main ]
 
-jobs: 
-  test: 
+jobs:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.10', '3.13']
+        python-version: ['3.10']
 
     steps:
     - uses:  actions/checkout@v4
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
-      with: 
+      with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
         cache-dependency-path: 'pyproject.toml'
 
+    - name: Apply patch
+      run: python apply_patch.py
+
+    - name: Install ccache
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: sudo apt-get update && sudo apt-get install -y ccache
+
+    - name: Setup ccache
+      uses: actions/cache@v4
+      with:
+        path: ~/.ccache
+        key: ccache-${{ matrix.os }}
+        restore-keys: |
+          ccache-${{ matrix.os }}
+          ccache-${{ matrix.os }}
+
+    - name: Configure ccache
+      run: |
+        ccache --set-config=max_size=5G
+        ccache --set-config=compression=true
+        ccache -z # Zero statistics
+
     - name: Build wheel
       uses: pypa/cibuildwheel@v3.3.1
-        python -m pip install --upgrade pip
-        python apply_patch.py
-        cd Slicer
-        python -m pip install . --extra-index-url https://wheels.vtk.org --extra-index-url https://vtk.org/files/wheel-sdks
+      env:
+        CIBW_BUILD_FRONTEND: "pip; args: --extra-index-url=https://wheels.vtk.org --extra-index-url=https://vtk.org/files/wheel-sdks"
+        CIBW_BUILD: cp310-*
+        CMAKE_C_COMPILER_LAUNCHE: ccache
+        CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      with:
+        package-dir: Slicer
+        output-dir: wheelhouse
+        config-file: "{package}/pyproject.toml"
+
+    - name: Show ccache statistics
+      run: ccache -s
 
     - uses: actions/upload-artifact@v4
       with:
         name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-        path: ./wheelhouse/*.whl
-    
+        path: ./Slicer/wheelhouse/*.whl

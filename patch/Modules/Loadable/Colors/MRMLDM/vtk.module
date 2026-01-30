@@ -1,0 +1,11 @@
+NAME
+  Slicer::ColorsModuleMRMLDisplayableManager
+LIBRARY_NAME
+  vtkSlicerColorsModuleMRMLDisplayableManager
+IMPLEMENTABLE
+DEPENDS
+  Slicer::ColorsModuleLogic
+  Slicer::ColorsModuleMRML
+  Slicer::ColorsModuleVTKWidgets
+DESCRIPTION
+  "vtkSlicerColorsModuleMRMLDisplayableManager"

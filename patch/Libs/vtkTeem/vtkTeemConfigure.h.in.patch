@@ -1,0 +1,21 @@
+diff --git a/Libs/vtkTeem/vtkTeemConfigure.h.in b/Libs/vtkTeem/vtkTeemConfigure.h.in
+index a416761649..3ab48a8250 100644
+--- a/Libs/vtkTeem/vtkTeemConfigure.h.in
++++ b/Libs/vtkTeem/vtkTeemConfigure.h.in
+@@ -8,14 +8,4 @@
+ #define VTKTEEM_STATIC
+ #endif
+ 
+-#if defined(WIN32) && !defined(VTKTEEM_STATIC)
+-#pragma warning ( disable : 4275 )
+-
+-#if defined(vtkTeem_EXPORTS)
+-#define VTK_Teem_EXPORT __declspec( dllexport )
+-#else
+-#define VTK_Teem_EXPORT __declspec( dllimport )
+-#endif
+-#else
+-#define VTK_Teem_EXPORT
+-#endif
++#include <vtkTeemModule.h>
+\ No newline at end of file
