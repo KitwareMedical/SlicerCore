@@ -136,5 +136,8 @@ vtk_module_definitions(Slicer::MRMLDisplayableManager
     MRMLDisplayableManager_USE_PYTHON
     "MRMLDisplayableManager_AUTOINIT=1(MRMLDisplayableManager)"
 )
-vtk_module_link(Slicer::MRMLDisplayableManager PUBLIC ${ITK_LIBRARIES} Python3::Python VTK::WrappingPythonCore)
+vtk_module_link(Slicer::MRMLDisplayableManager
+  PUBLIC ${ITK_LIBRARIES}
+  PRIVATE VTK::WrappingPythonCore
+)
 vtk_module_include(Slicer::MRMLDisplayableManager PUBLIC ${ITK_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})

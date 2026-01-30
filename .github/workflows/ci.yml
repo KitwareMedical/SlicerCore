@@ -1,37 +1,84 @@
 name: Python CI
 
 on:
-  pull_request: 
+  pull_request:
     branches:  [ main ]
 
-jobs: 
-  test: 
+jobs:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.10', '3.13']
+        python-version: ['3.10']
 
     steps:
     - uses:  actions/checkout@v4
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
-      with: 
+      with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
         cache-dependency-path: 'pyproject.toml'
 
+    - name: Apply patch
+      run: python apply_patch.py
+
+    - name: ccache install
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: sudo apt-get update && sudo apt-get install -y ccache
+
+    - name: ccache setup
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ccache
+        key: ccache-${{ matrix.os }}
+        restore-keys: |
+          ccache-${{ matrix.os }}
+          ccache-${{ matrix.os }}
+
+    - name: ccache config
+      run: |
+        ccache --set-config=max_size=2G
+        ccache --set-config=compression=true
+        ccache --show-config
+
     - name: Build wheel
       uses: pypa/cibuildwheel@v3.3.1
-        python -m pip install --upgrade pip
-        python apply_patch.py
-        cd Slicer
-        python -m pip install . --extra-index-url https://wheels.vtk.org --extra-index-url https://vtk.org/files/wheel-sdks
+      env:
+        CIBW_BUILD_FRONTEND: "pip; args: --extra-index-url=https://wheels.vtk.org --extra-index-url=https://vtk.org/files/wheel-sdks"
+        CIBW_BUILD: cp310-manylinux*
+
+        # cibuildwheel creates a docker container for building our wheel
+        # This is all the required steps to use host ccache correctly
+        CIBW_CONTAINER_ENGINE: "docker; create_args: --volume /home/runner/.cache/ccache:/host/.cache/ccache --volume /home/runner/.config/ccache:/host/.config/ccache"
+        CIBW_BEFORE_ALL_LINUX: |
+          yum install -y ccache
+          ccache --show-config
+          ccache -z
+        CIBW_ENVIRONMENT: >-
+          CCACHE_DIR=/host/.cache/ccache
+          CCACHE_CONFIGPATH=/host/.config/ccache/ccache.conf
+          CMAKE_C_COMPILER_LAUNCHE=ccache
+          CMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+        # Do not repair, everything is already put just as needed to make it work
+        # SlicerCore uses extensive CMake logic to package everything as needed, do not try this at home!
+        CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
+          python -m pip install wheel &&
+          python -m wheel tags --platform-tag manylinux_2_28_x86_64 --remove {wheel} &&
+          cp $(dirname {wheel})/slicer_core*.whl {dest_dir}
+      with:
+        package-dir: Slicer
+        output-dir: wheelhouse
+        config-file: "{package}/pyproject.toml"
+
+    - name: ccache stats
+      run: ccache -s -v
 
     - uses: actions/upload-artifact@v4
       with:
         name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
         path: ./wheelhouse/*.whl
-    
