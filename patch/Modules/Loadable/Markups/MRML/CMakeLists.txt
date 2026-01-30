@@ -1,4 +1,4 @@
-find_package(RapidJSON REQUIRED)
+vtk_module_find_package(PACKAGE RapidJSON PRIVATE_IF_SHARED)
 
 set(classes
   vtkMRMLMarkupsJsonElement
@@ -18,4 +18,4 @@ vtk_module_add_module(Slicer::MarkupsModuleMRML
   HEADERS ${wrapper_header_file}
 )
 
-vtk_module_link(Slicer::MarkupsModuleMRML PUBLIC RapidJSON)
+vtk_module_link(Slicer::MarkupsModuleMRML PRIVATE RapidJSON)

@@ -3,6 +3,7 @@ NAME
 LIBRARY_NAME
   MRMLCore
 DEPENDS
+  VTK::ChartsCore
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

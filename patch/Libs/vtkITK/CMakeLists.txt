@@ -9,43 +9,37 @@ endif()
 # Dependencies
 # --------------------------------------------------------------------------
 
-#
-# ITK
-#
-set(itk_components
-  GrowCut
-  ITKAnisotropicSmoothing
-  ITKCommon
-  ITKConnectedComponents
-  ITKDistanceMap
-  ITKIODCMTK
-  ITKIOGDCM
-  ITKIOGE
-  ITKIOImageBase
-  ITKIOMeta
-  ITKIONIFTI
-  ITKIONRRD
-  ITKImageCompose
-  ITKImageFilterBase
-  ITKImageFunction
-  ITKImageGrid
-  ITKLabelMap
-  ITKGDCM
-  ITKPath
-  ITKRegionGrowing
-  ITKThresholding
-  ITKVTK
-  ITKVtkGlue
-  MorphologicalContourInterpolation
+vtk_module_find_package(
+  PACKAGE ITK
+  COMPONENTS
+    GrowCut
+    ITKAnisotropicSmoothing
+    ITKCommon
+    ITKConnectedComponents
+    ITKDistanceMap
+    ITKIODCMTK
+    ITKIOGDCM
+    ITKIOGE
+    ITKIOImageBase
+    ITKIOMeta
+    ITKIONIFTI
+    ITKIONRRD
+    ITKImageCompose
+    ITKImageFilterBase
+    ITKImageFunction
+    ITKImageGrid
+    ITKLabelMap
+    ITKGDCM
+    ITKPath
+    ITKRegionGrowing
+    ITKThresholding
+    ITKVTK
+    ITKVtkGlue
+    MorphologicalContourInterpolation
 )
-
-find_package(ITK 5.0 COMPONENTS ${itk_components} REQUIRED)
 include(${ITK_USE_FILE})
 
-#
-# vtkAddon
-#
-find_package(vtkAddon REQUIRED)
+vtk_module_find_package(PACKAGE vtkAddon)
 
 # --------------------------------------------------------------------------
 # Configure headers
@@ -96,6 +90,7 @@ set(sources
 )
 
 set(headers
+  vtkITKExport.h
   vtkITKNumericTraits.h
   ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
   ${wrapper_header_file}
@@ -114,4 +109,3 @@ set_source_files_properties(
 )
 
 vtk_module_link(Slicer::ITK PUBLIC ${ITK_LIBRARIES} vtkAddon)
-vtk_module_include(Slicer::ITK PUBLIC ${ITK_INCLUDE_DIRS} ${vtkAddon_INCLUDE_DIRS})

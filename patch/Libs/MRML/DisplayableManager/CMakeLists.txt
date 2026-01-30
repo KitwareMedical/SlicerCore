@@ -1,10 +1,13 @@
-#
-# ITK
-#
-set(${PROJECT_NAME}_ITK_COMPONENTS
-  ITKCommon
+# --------------------------------------------------------------------------
+# Dependencies
+# --------------------------------------------------------------------------
+
+vtk_module_find_package(
+  PACKAGE ITK
+  COMPONENTS
+    ITKCommon
 )
-find_package(ITK 4.6 COMPONENTS ${${PROJECT_NAME}_ITK_COMPONENTS} REQUIRED)
+
 include(${ITK_USE_FILE})
 
 # --------------------------------------------------------------------------
@@ -85,6 +88,7 @@ if(VTK_WRAP_PYTHON)
 endif()
 
 set(headers
+  vtkMRMLDisplayableManagerExport.h
   ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
   ${wrapper_header_file}
 )
@@ -136,5 +140,7 @@ vtk_module_definitions(Slicer::MRMLDisplayableManager
     MRMLDisplayableManager_USE_PYTHON
     "MRMLDisplayableManager_AUTOINIT=1(MRMLDisplayableManager)"
 )
-vtk_module_link(Slicer::MRMLDisplayableManager PUBLIC ${ITK_LIBRARIES} Python3::Python VTK::WrappingPythonCore)
-vtk_module_include(Slicer::MRMLDisplayableManager PUBLIC ${ITK_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})
+vtk_module_link(Slicer::MRMLDisplayableManager
+  PUBLIC ${ITK_LIBRARIES}
+  PRIVATE VTK::WrappingPythonCore Python3::Module
+)

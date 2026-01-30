@@ -2,13 +2,11 @@
 # Dependencies
 # --------------------------------------------------------------------------
 
-#
-# ITK
-#
-set(${PROJECT_NAME}_ITK_COMPONENTS
-  ITKCommon
+vtk_module_find_package(
+  PACKAGE ITK
+  COMPONENTS
+    ITKCommon
 )
-find_package(ITK 4.6 COMPONENTS ${${PROJECT_NAME}_ITK_COMPONENTS} REQUIRED)
 include(${ITK_USE_FILE})
 
 # --------------------------------------------------------------------------
@@ -43,6 +41,7 @@ set(classes
 )
 
 set(headers
+  vtkMRMLLogicExport.h
   ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
   ${wrapper_header_file}
 )
@@ -54,4 +53,3 @@ vtk_module_add_module(Slicer::MRMLLogic
 )
 
 vtk_module_link(Slicer::MRMLLogic PUBLIC ${ITK_LIBRARIES})
-vtk_module_include(Slicer::MRMLLogic PUBLIC ${ITK_INCLUDE_DIRS})

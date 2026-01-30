@@ -1,4 +1,8 @@
-find_package(ITK 5.0 REQUIRED COMPONENTS ITKTransform)
+vtk_module_find_package(
+  PACKAGE ITK
+  COMPONENTS
+    ITKTransform
+)
 
 set(classes vtkSlicerTransformLogic)
 
@@ -14,4 +18,3 @@ vtk_module_add_module(Slicer::TransformsModuleLogic
 )
 
 vtk_module_link(Slicer::TransformsModuleLogic PUBLIC ${ITK_LIBRARIES})
-vtk_module_include(Slicer::TransformsModuleLogic PUBLIC ${ITK_INCLUDE_DIRS})

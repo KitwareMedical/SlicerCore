@@ -1,0 +1,9 @@
+NAME
+  Dummy::MRMLDisplayableManager
+LIBRARY_NAME
+  vtkDummyMRMLDisplayableManager
+IMPLEMENTABLE
+DEPENDS
+  Slicer::MRMLDisplayableManager
+DESCRIPTION
+  "vtkDummyMRMLDisplayableManager"

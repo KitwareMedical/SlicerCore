@@ -1,8 +1,14 @@
-# ModuleDescriptionParser
-find_package(SlicerExecutionModel REQUIRED ModuleDescriptionParser)
+vtk_module_find_package(
+  PACKAGE SlicerExecutionModel
+  COMPONENTS ModuleDescriptionParser
+  PRIVATE_IF_SHARED
+)
 
 # ITK - Import ITK targets required by ModuleDescriptionParser
-find_package(ITK 5.3 COMPONENTS ${ModuleDescriptionParser_ITK_COMPONENTS} REQUIRED)
+vtk_module_find_package(
+  PACKAGE ITK
+  COMPONENTS ${ModuleDescriptionParser_ITK_COMPONENTS}
+)
 
 slicercore_generate_module_wrapper(
   HEADER_NAME "vtkMRMLCLIModule.h"
@@ -17,5 +23,5 @@ vtk_module_add_module(Slicer::MRMLCLI
   HEADERS ${wrapper_header_file}
 )
 
-vtk_module_link(Slicer::MRMLCLI PUBLIC ${ITK_LIBRARIES} ModuleDescriptionParser)
-vtk_module_include(Slicer::MRMLCLI PUBLIC ${ITK_INCLUDE_DIRS} ${ModuleDescriptionParser_INCLUDE_DIRS})
+vtk_module_link(Slicer::MRMLCLI PUBLIC ${ITK_LIBRARIES} PRIVATE ModuleDescriptionParser)
+vtk_module_include(Slicer::MRMLCLI PRIVATE ${ModuleDescriptionParser_INCLUDE_DIRS})

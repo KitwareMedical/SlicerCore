@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.21...3.31)
 project(${SKBUILD_PROJECT_NAME} VERSION ${SKBUILD_PROJECT_VERSION})
 
 option(BUILD_SHARED_LIBS "Build shared libraries." ON)
+option(BUILD_SDK "If ON, build SlicerCore-SDK instead of SlicerCore runtime" OFF)
 option(USE_SUPERBUILD "Build dependencies using Slicer superbuild" ON)
 option(USE_SYSTEM_LINKER "Slicer core uses mold or lld on Linux when available, if ON this will fallback to system linker" OFF)
 
@@ -16,12 +17,9 @@ if(USE_SUPERBUILD)
   return()
 endif()
 
-include(FetchContent)
-FetchContent_Declare(vtk-sdk-python-helper
-  GIT_REPOSITORY https://github.com/Kitware/vtk-sdk-python-wheel-helper.git
-  GIT_TAG        main
-)
-FetchContent_MakeAvailable(vtk-sdk-python-helper)
+if(BUILD_SDK AND (NOT DEFINED SDK_DEPS_DIR OR NOT EXISTS "${SDK_DEPS_DIR}"))
+  message(FATAL_ERROR "SDK_DEPS_DIR must be defined to the location of ITK (and its dependencies) and vtkAddon install trees.")
+endif()
 
 set(modules
   # Libs/
@@ -73,25 +71,60 @@ set(modules
   Slicer::VolumesModuleLogic
 )
 
-# Let vtksdk helper do its job
-vtksdk_build_modules(${SKBUILD_PROJECT_NAME} MODULES ${modules})
-vtksdk_generate_package_init(${SKBUILD_PROJECT_NAME} MODULES ${modules})
-vtksdk_install_runtimes_deps(${SKBUILD_PROJECT_NAME} MODULES ${modules})
+set(layout Runtime)
+if(BUILD_SDK)
+  set(layout SDK)
+endif()
 
-# Install slicer scripts comptatible with slicerlib
-# These scripts enable users to use slicer in python as-if they were using SlicerPython
-# Example: `import slicer; slicer.vtkMRMLNode()`
-install(FILES
-  ${CMAKE_SOURCE_DIR}/SlicerCore/Python/slicer/__init__.py
-  ${CMAKE_SOURCE_DIR}/SlicerCore/Python/slicer/slicer_core.py
-  DESTINATION slicer
+include(VTKSDKPythonWheelHelper)
+
+# Install runtime only dependencies
+vtksdk_build_modules(${SKBUILD_PROJECT_NAME}
+  MODULES ${modules}
+  LAYOUT ${layout}
 )
 
-# Install scripts from classic SlicerPython
-# Everything related to ctk, qt, etc is not supported,
-# so calling some function of util.py will fail at runtime.
-set(Slicer_PYTHON_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Base/Python)
-install(FILES
-  ${Slicer_PYTHON_SOURCE_DIR}/slicer/util.py
-  DESTINATION slicer
-)
+if(BUILD_SDK)
+  vtksdk_install_modules_sdk(${SKBUILD_PROJECT_NAME}
+    MODULES ${modules}
+    PREFIX_PATHS
+      "slicer_core_sdk/content/third_party"
+    CMAKE_MODULES_INCLUDED
+      "${CMAKE_CURRENT_SOURCE_DIR}/CMake/SlicerCoreModuleWrapper.cmake"
+  )
+
+  # Install dependencies required to consume SlicerCore as a SDK
+  install(
+    DIRECTORY ${SDK_DEPS_DIR}/
+    DESTINATION slicer_core_sdk/content/third_party
+    USE_SOURCE_PERMISSIONS
+  )
+
+  if(UNIX)
+    # DCMTK do not use the right prefix for CMake scripts, this is a simple passthrough to make CMake happy
+    install(
+      DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SlicerCoreSDK/third_party_patches/cmake/DCMTK/
+      DESTINATION slicer_core_sdk/content/third_party/lib/cmake/DCMTK
+    )
+  endif()
+else()
+  vtksdk_generate_package_init(${SKBUILD_PROJECT_NAME} MODULES ${modules})
+  vtksdk_install_runtimes_deps(${SKBUILD_PROJECT_NAME} MODULES ${modules})
+
+  # These scripts enable users to use slicer in python as-if they were using SlicerPython
+  # Example: `import slicer; slicer.vtkMRMLNode()`
+  install(FILES
+    ${CMAKE_SOURCE_DIR}/SlicerCore/Python/slicer/__init__.py
+    ${CMAKE_SOURCE_DIR}/SlicerCore/Python/slicer/slicer_core.py
+    DESTINATION slicer
+  )
+
+  # Install scripts from classic SlicerPython
+  # Everything related to ctk, qt, etc is not supported,
+  # so calling some function of util.py will fail at runtime.
+  set(Slicer_PYTHON_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Base/Python)
+  install(FILES
+    ${Slicer_PYTHON_SOURCE_DIR}/slicer/util.py
+    DESTINATION slicer
+  )
+endif()

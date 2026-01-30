@@ -30,13 +30,13 @@ set(classes
     ... source files
   )
 
-vtk_module_add_module(VTK::Slicer[name]Module[part]
+vtk_module_add_module(Slicer::[name]Module[part]
   EXPORT_MACRO_PREFIX VTK_SLICER_[NAME]_MODULE_[PART]
   CLASSES ${classes}
 )
 
-vtk_module_include(VTK::Slicer[name]Module[part] PUBLIC $<BUILD_INTERFACE:...>)
-vtk_module_link(Slicer[name]Module[part] PUBLIC ...)
+vtk_module_include(Slicer::[name]Module[part] ...)
+vtk_module_link(Slicer::[name]Module[part] ...)
 ```
 
 ### Change export file include

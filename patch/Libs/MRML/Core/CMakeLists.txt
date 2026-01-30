@@ -42,38 +42,39 @@ set(MRML_APPLICATION_SHARE_SUBDIR_ENV "SLICER_SHARE_DIR")
 # Dependencies
 # --------------------------------------------------------------------------
 
-#
-# ITK
-#
-set(${PROJECT_NAME}_ITK_COMPONENTS
-  ITKCommon
-  ITKIOImageBase
-  ITKIONRRD
-  ITKIOSpatialObjects
-  ITKIOTransformBase
-  ITKIOTransformHDF5
-  ITKIOTransformInsightLegacy
-  ITKIOTransformMatlab
-  ITKMesh
-  ITKTransform
+vtk_module_find_package(
+  PACKAGE LibArchive
+  PRIVATE_IF_SHARED
 )
-find_package(ITK 4.6 COMPONENTS ${${PROJECT_NAME}_ITK_COMPONENTS} REQUIRED)
+
+vtk_module_find_package(
+  PACKAGE RapidJSON
+  PRIVATE_IF_SHARED
+)
+
+vtk_module_find_package(
+  PACKAGE Teem
+  PRIVATE_IF_SHARED
+)
+
+vtk_module_find_package(
+  PACKAGE ITK
+  COMPONENTS
+    ITKCommon
+    ITKIOImageBase
+    ITKIONRRD
+    ITKIOSpatialObjects
+    ITKIOTransformBase
+    ITKIOTransformHDF5
+    ITKIOTransformInsightLegacy
+    ITKIOTransformMatlab
+    ITKMesh
+    ITKTransform
+)
+
 include(${ITK_USE_FILE})
 
-#
-# LibArchive
-#
-find_package(LibArchive REQUIRED MODULE)
-
-#
-# RapidJSON
-#
-find_package(RapidJSON REQUIRED CONFIG)
-
-#
-# vtkAddon
-#
-find_package(vtkAddon REQUIRED)
+vtk_module_find_package(PACKAGE vtkAddon)
 
 # --------------------------------------------------------------------------
 # Configure headers
@@ -256,12 +257,6 @@ set_source_files_properties(
   ABSTRACT
 )
 
-#-----------------------------------------------------------------------------
-# Wrapping hints used by all Tcl, Python and Java wrapping.
-# It can also be used by external wrapping tools.
-# --------------------------------------------------------------------------
-set(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping/Tcl/hints)
-
 # --------------------------------------------------------------------------
 # Build library
 # --------------------------------------------------------------------------
@@ -272,5 +267,14 @@ vtk_module_add_module(Slicer::MRMLCore
   HEADERS ${headers}
 )
 
-vtk_module_link(Slicer::MRMLCore PUBLIC RapidJSON ${ITK_LIBRARIES} ${LibArchive_LIBRARY} vtkAddon)
-vtk_module_include(Slicer::MRMLCore PUBLIC ${ITK_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${vtkAddon_INCLUDE_DIRS})
+vtk_module_link(Slicer::MRMLCore
+  PUBLIC
+    vtkAddon
+  PRIVATE
+    ${ITK_LIBRARIES}
+    RapidJSON
+    ${LibArchive_LIBRARY}
+    Teem::teem
+)
+
+vtk_module_include(Slicer::MRMLCore PRIVATE ${LibArchive_INCLUDE_DIRS})

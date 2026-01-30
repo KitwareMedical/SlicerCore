@@ -2,10 +2,7 @@
 set(proj vtkAddon)
 
 # Set dependency list
-set(${proj}_DEPENDENCIES)
-if(NOT SLICERLIB_PYTHON_BUILD)
-  list(APPEND ${proj}_DEPENDENCIES "VTK")
-endif()
+set(${proj}_DEPENDENCIES VTK)
 
 # Include dependent projects if any
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
@@ -14,15 +11,15 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
 
   ExternalProject_SetIfNotDefined(
     Slicer_${proj}_GIT_REPOSITORY
-    "${EP_GIT_PROTOCOL}://github.com/Slicer/vtkAddon.git"
+    "${EP_GIT_PROTOCOL}://github.com/AlexyPellegrini/vtkAddon.git"
     QUIET
-    )
+  )
 
   ExternalProject_SetIfNotDefined(
     Slicer_${proj}_GIT_TAG
-    "main"
+    "python-dev-cmake"
     QUIET
-    )
+  )
 
   cmake_path(CONVERT Python_EXECUTABLE TO_CMAKE_PATH_LIST Python_EXECUTABLE NORMALIZE)
   set(EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS)
@@ -49,6 +46,7 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
 
   set(EP_SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj})
   set(EP_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
+  set(EP_INSTALL_DIR ${EP_DEPENDENCIES_INSTALL_DIR})
 
   ExternalProject_Add(${proj}
     ${${proj}_EP_ARGS}
@@ -62,22 +60,23 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
       -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+      -DCMAKE_INSTALL_PREFIX:PATH=${EP_INSTALL_DIR}
       -DBUILD_SHARED_LIBS:BOOL=ON
       -DBUILD_TESTING:BOOL=OFF
       -DvtkAddon_USE_UTF8:BOOL=ON
       -DvtkAddon_CMAKE_DIR:PATH=${EP_SOURCE_DIR}/CMake
       -DvtkAddon_LAUNCH_COMMAND:STRING=${Slicer_LAUNCH_COMMAND}
+      -DVTK_WRAP_PYTHON_FIND_LIBS:BOOL=OFF
       -DVTK_DIR:PATH=${VTK_DIR}
       ${vtkAddon_CMAKE_CACHE_ARGS}
       ${EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS}
-    INSTALL_COMMAND ""
     DEPENDS
       ${${proj}_DEPENDENCIES}
-    )
+  )
 
-  #ExternalProject_GenerateProjectDescription_Step(${proj})
+  ExternalProject_GenerateProjectDescription_Step(${proj})
 
-  set(vtkAddon_DIR ${EP_BINARY_DIR})
+  set(vtkAddon_DIR ${EP_INSTALL_DIR}/lib/CMake/vtkAddon)
 
   # Add path to SlicerLauncherSettings.ini
   set(${proj}_LIBRARY_PATHS_LAUNCHER_BUILD ${vtkAddon_DIR}/<CMAKE_CFG_INTDIR>)
@@ -117,4 +116,4 @@ endif()
 mark_as_superbuild(
   VARS vtkAddon_DIR:PATH
   LABELS "FIND_PACKAGE"
-  )
+)

@@ -1,37 +1,126 @@
 name: Python CI
 
 on:
-  pull_request: 
+  pull_request:
     branches:  [ main ]
 
-jobs: 
-  test: 
+jobs:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.10', '3.13']
+        vtk-tag: ['9.6.0'] # pyproject enforces this specific version
+        python-version: ['3.10']
+        # list from https://cibuildwheel.pypa.io/en/stable/options/#build-skip
+        build-target: ['cp310-manylinux_x86_64']
+
+    env:
+      CIBW_BUILD: ${{ matrix.build-target }}
+      # cibuildwheel creates a docker container for building our wheel
+      # This is all the required steps to use host ccache correctly
+      CIBW_CONTAINER_ENGINE: "docker; create_args: --volume /home/runner/.cache/ccache:/host/.cache/ccache --volume /home/runner/.config/ccache:/host/.config/ccache"
+      # Install a compiler cache on each platform
+      CIBW_BEFORE_ALL_LINUX: |
+        yum install -y ccache
+        ccache --show-config
+        ccache -z
+      CIBW_BUILD_FRONTEND: "pip; args: --no-build-isolation"
+      CIBW_BEFORE_BUILD: >-
+        pip install scikit-build-core
+          vtk-sdk==${{ matrix.vtk-tag }}
+          vtk==${{ matrix.vtk-tag }}
+          vtk-sdk-python-wheel-helper 
+          --extra-index-url https://wheels.vtk.org
+          --extra-index-url https://vtk.org/files/wheel-sdks
+      CIBW_ENVIRONMENT: >-
+        CCACHE_DIR=/host/.cache/ccache
+        CCACHE_CONFIGPATH=/host/.config/ccache/ccache.conf
+        CMAKE_C_COMPILER_LAUNCHER=ccache
+        CMAKE_CXX_COMPILER_LAUNCHER=ccache
+      # Do not repair, everything is already put just as needed to make it work
+      # SlicerCore uses extensive CMake logic to package everything as needed, do not try this at home!
+      CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
+        python -m pip install wheel &&
+        python -m wheel tags --platform-tag manylinux_2_28_x86_64 --remove {wheel} &&
+        cp $(dirname {wheel})/slicer_core*.whl {dest_dir}
 
     steps:
-    - uses:  actions/checkout@v4
-    
+    - uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
-      with: 
+      with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
         cache-dependency-path: 'pyproject.toml'
 
+    - name: Apply patch
+      run: python apply_patch.py
+
+    - name: ccache install
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: sudo apt-get update && sudo apt-get install -y ccache
+
+    - name: Restore ccache
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/ccache
+        # Per-OS cache, superbuild should almost always be the same for most translation units except the Python wrappers,
+        # but Python wrappers are pretty quick to build anyway.
+        # Use a unique key (run_id) to force a new cache entry to be created as we cannot overwrite an existing cache key.
+        key: ccache-${{ matrix.os }}-${{ github.run_id }}
+        restore-keys: |
+          ccache-${{ matrix.os }}-
+
+    - name: ccache config
+      # 256Mio per OS should be enough, up to date cache will have around 200Mio of objects
+      run: |
+        ccache --set-config=max_size=256Mi
+        ccache --set-config=compression=true
+        ccache --show-config
+
     - name: Build wheel
       uses: pypa/cibuildwheel@v3.3.1
-        python -m pip install --upgrade pip
-        python apply_patch.py
-        cd Slicer
-        python -m pip install . --extra-index-url https://wheels.vtk.org --extra-index-url https://vtk.org/files/wheel-sdks
-
-    - uses: actions/upload-artifact@v4
       with:
-        name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-        path: ./wheelhouse/*.whl
-    
+        package-dir: Slicer
+        output-dir: wheelhouse
+
+    - name: ccache stats (after Runtime build)
+      run: ccache -s -v
+
+    - name: Upload wheel
+      uses: actions/upload-artifact@v4
+      with:
+        name: slicer-core-${{ matrix.python-version }}-${{ matrix.build-target }}
+        path: wheelhouse/slicer_core-*.whl
+
+    - name: Build wheel SDK
+      uses: pypa/cibuildwheel@v3.3.1
+      with:
+        package-dir: Slicer/SlicerCoreSDK
+        output-dir: wheelhouse
+
+    - name: ccache stats (after SDK build)
+      run: ccache -s -v
+
+    - name: Upload wheel SDK
+      uses: actions/upload-artifact@v4
+      with:
+        name: slicer-core-sdk-${{ matrix.python-version }}-${{ matrix.build-target }}
+        path: wheelhouse/slicer_core_sdk-*.whl
+
+    - name: Test
+      run: |
+        sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev
+        python -m pip install virtualenv pytest
+        python -m pytest --local-wheels=wheelhouse --verbose Slicer/SlicerCoreSDK
+
+    - name: Save ccache
+      uses: actions/cache/save@v4
+      # We want the cache to be updated regarless of success or not
+      if: always()
+      with:
+        path: ~/.cache/ccache
+        key: ccache-${{ matrix.os }}-${{ github.run_id }}

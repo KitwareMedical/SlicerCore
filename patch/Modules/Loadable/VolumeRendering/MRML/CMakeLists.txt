@@ -1,5 +1,5 @@
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(JsonCpp REQUIRED)
+vtk_module_find_package(PACKAGE JsonCpp PRIVATE_IF_SHARED)
 
 set(classes
   vtkMRMLCPURayCastVolumeRenderingDisplayNode
@@ -24,5 +24,5 @@ vtk_module_add_module(Slicer::VolumeRenderingModuleMRML
   HEADERS ${wrapper_header_file}
 )
 
-vtk_module_include(Slicer::VolumeRenderingModuleMRML PUBLIC ${JsonCpp_INCLUDE_DIRS})
-vtk_module_link(Slicer::VolumeRenderingModuleMRML PUBLIC ${JsonCpp_LIBRARY})
+vtk_module_include(Slicer::VolumeRenderingModuleMRML PRIVATE ${JsonCpp_INCLUDE_DIRS})
+vtk_module_link(Slicer::VolumeRenderingModuleMRML PRIVATE ${JsonCpp_LIBRARY})

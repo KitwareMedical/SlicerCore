@@ -1,0 +1,13 @@
+diff --git a/Libs/MRML/Core/vtkMRMLSegmentationStorageNode.cxx b/Libs/MRML/Core/vtkMRMLSegmentationStorageNode.cxx
+index 019d51e2f2..970e837ab1 100644
+--- a/Libs/MRML/Core/vtkMRMLSegmentationStorageNode.cxx
++++ b/Libs/MRML/Core/vtkMRMLSegmentationStorageNode.cxx
+@@ -69,6 +69,8 @@
+ # include <itkNrrdImageIO.h>
+ #endif
+ 
++#include "teem/nrrd.h"
++
+ // STL & C++ includes
+ #include <iterator>
+ #include <sstream>

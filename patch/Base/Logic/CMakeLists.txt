@@ -2,32 +2,27 @@
 # Dependencies
 # --------------------------------------------------------------------------
 
-#
-# ModuleDescriptionParser
-#
-find_package(SlicerExecutionModel REQUIRED ModuleDescriptionParser)
+vtk_module_find_package(
+  PACKAGE SlicerExecutionModel
+  COMPONENTS ModuleDescriptionParser
+  PRIVATE_IF_SHARED
+)
+vtk_module_find_package(
+  PACKAGE LibArchive
+  PRIVATE_IF_SHARED
+)
 
-#
-# ITK
-#
-find_package(ITK 4.6 COMPONENTS
-  ITKCommon
-  ITKIOTransformBase
-  ITKTransform
-  ${ModuleDescriptionParser_ITK_COMPONENTS}
-  REQUIRED
+vtk_module_find_package(
+  PACKAGE ITK
+  COMPONENTS
+    ITKCommon
+    ITKIOTransformBase
+    ITKTransform
+    ${ModuleDescriptionParser_ITK_COMPONENTS}
 )
 include(${ITK_USE_FILE})
 
-#
-# LibArchive
-#
-find_package(LibArchive REQUIRED MODULE)
-
-#
-# vtkAddon
-#
-find_package(vtkAddon REQUIRED)
+vtk_module_find_package(PACKAGE vtkAddon)
 
 # --------------------------------------------------------------------------
 # Subdirectories
@@ -41,12 +36,11 @@ set(configure_header_file vtkSlicerBaseLogicConfigure.h)
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${configure_header_file}.in
   ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
-  )
+)
 
 # --------------------------------------------------------------------------
 # Build library
 # --------------------------------------------------------------------------
-
 set(classes
   # Logic classes (data management and calculation)
   vtkSlicerApplicationLogic
@@ -62,7 +56,11 @@ set(classes
   vtkSlicerScriptedLoadableModuleLogic
 )
 
-set(headers ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file})
+set(headers
+  vtkSlicerBaseLogic.h
+  vtkSlicerBaseLogicExport.h
+  ${CMAKE_CURRENT_BINARY_DIR}/${configure_header_file}
+)
 
 vtk_module_add_module(Slicer::BaseLogic
   EXPORT_MACRO_PREFIX VTK_SLICER_BASE_LOGIC
@@ -70,10 +68,16 @@ vtk_module_add_module(Slicer::BaseLogic
   HEADERS ${headers}
 )
 
-vtk_module_link(Slicer::BaseLogic PUBLIC
-  ${ITK_LIBRARIES} ${LibArchive_LIBRARY} ModuleDescriptionParser vtkAddon
+vtk_module_link(Slicer::BaseLogic
+  PUBLIC
+    ${ITK_LIBRARIES} vtkAddon
+  PRIVATE
+    ModuleDescriptionParser
+    ${LibArchive_LIBRARY}
 )
 
-vtk_module_include(Slicer::BaseLogic PUBLIC
-  ${ITK_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIRS} ${ModuleDescriptionParser_INCLUDE_DIRS} ${vtkAddon_INCLUDE_DIRS}
+vtk_module_include(Slicer::BaseLogic
+  PRIVATE
+    ${ModuleDescriptionParser_INCLUDE_DIRS}
+    ${LibArchive_INCLUDE_DIRS}
 )

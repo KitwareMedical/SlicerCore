@@ -2,16 +2,19 @@
 # Dependencies
 # --------------------------------------------------------------------------
 
-find_package(CURL REQUIRED)
+vtk_module_find_package(
+  PACKAGE CURL
+  PRIVATE_IF_SHARED
+)
 
 if(Slicer_USE_PYTHONQT_WITH_OPENSSL)
-  find_package(OpenSSL REQUIRED)
+  vtk_module_find_package(
+    PACKAGE OpenSSL
+    PRIVATE_IF_SHARED
+  )
 endif()
 
-#
-# vtkAddon
-#
-find_package(vtkAddon REQUIRED)
+vtk_module_find_package(PACKAGE vtkAddon)
 
 # --------------------------------------------------------------------------
 # Configure headers
@@ -44,11 +47,11 @@ vtk_module_add_module(Slicer::RemoteIO
   HEADERS ${headers}
 )
 
-vtk_module_link(Slicer::RemoteIO PUBLIC vtkAddon ${CURL_LIBRARIES})
-vtk_module_include(Slicer::RemoteIO PUBLIC ${vtkAddon_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+vtk_module_link(Slicer::RemoteIO PUBLIC vtkAddon PRIVATE ${CURL_LIBRARIES})
+vtk_module_include(Slicer::RemoteIO PRIVATE ${CURL_INCLUDE_DIRS})
 
 if(WIN32)
   # Define CURL_STATICLIB when linking against static curl on Windows
   vtk_module_definitions(Slicer::RemoteIO PRIVATE CURL_STATICLIB)
-  vtk_module_link(Slicer::RemoteIO PUBLIC iphlpapi ws2_32)
+  vtk_module_link(Slicer::RemoteIO PRIVATE iphlpapi ws2_32)
 endif()

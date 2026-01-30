@@ -1,4 +1,4 @@
-find_package(RapidJSON REQUIRED)
+vtk_module_find_package(PACKAGE RapidJSON PRIVATE_IF_SHARED)
 
 set(classes vtkSlicerVolumesLogic)
 
@@ -13,4 +13,4 @@ vtk_module_add_module(Slicer::VolumesModuleLogic
   HEADERS ${wrapper_header_file}
 )
 
-vtk_module_link(Slicer::VolumesModuleLogic PUBLIC RapidJSON)
+vtk_module_link(Slicer::VolumesModuleLogic PRIVATE RapidJSON)

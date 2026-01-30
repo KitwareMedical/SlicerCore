@@ -1,0 +1,36 @@
+diff --git a/Libs/vtkTeem/vtkTeemNRRDWriter.cxx b/Libs/vtkTeem/vtkTeemNRRDWriter.cxx
+index 543a1636ac..037b4516b8 100644
+--- a/Libs/vtkTeem/vtkTeemNRRDWriter.cxx
++++ b/Libs/vtkTeem/vtkTeemNRRDWriter.cxx
+@@ -1,6 +1,7 @@
+ #include <map>
+ 
+ #include "vtkTeemNRRDWriter.h"
++#include "teem/nrrd.h"
+ 
+ #include "vtkImageData.h"
+ #include "vtkPointData.h"
+@@ -476,3 +477,23 @@ void vtkTeemNRRDWriter::SetVectorAxisKind(int kind)
+ {
+   this->VectorAxisKind = kind;
+ }
++
++void vtkTeemNRRDWriter::vtkSetSpaceToRAS()
++{
++  this->SetSpace(nrrdSpaceRightAnteriorSuperior);
++}
++
++void vtkTeemNRRDWriter::vtkSetSpaceToRAST()
++{
++  this->SetSpace(nrrdSpaceRightAnteriorSuperiorTime);
++}
++
++void vtkTeemNRRDWriter::vtkSetSpaceToLPS()
++{
++  this->SetSpace(nrrdSpaceLeftPosteriorSuperior);
++}
++
++void vtkTeemNRRDWriter::vtkSetSpaceToLPST()
++{
++  this->SetSpace(nrrdSpaceLeftPosteriorSuperiorTime);
++}

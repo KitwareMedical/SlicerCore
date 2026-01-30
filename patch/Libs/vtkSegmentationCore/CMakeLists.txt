@@ -2,14 +2,15 @@ option(vtkSegmentationCore_USE_UUID "Use UUIDs for generating segment IDs. Requi
 mark_as_advanced(vtkSegmentationCore_USE_UUID)
 
 if(vtkSegmentationCore_USE_UUID)
-  find_package(ITK REQUIRED COMPONENTS ITKGDCM)
+  vtk_module_find_package(
+    PACKAGE ITK
+    COMPONENTS
+      ITKGDCM
+  )
   include(${ITK_USE_FILE})
 endif()
 
-#
-# vtkAddon
-#
-find_package(vtkAddon REQUIRED)
+vtk_module_find_package(PACKAGE vtkAddon)
 
 set(configure_header_file vtkSegmentationCoreConfigure.h)
 configure_file(
@@ -55,10 +56,9 @@ vtk_module_add_module(Slicer::SegmentationCore
 )
 
 vtk_module_link(Slicer::SegmentationCore PUBLIC vtkAddon)
-vtk_module_include(Slicer::SegmentationCore PUBLIC ${vtkAddon_INCLUDE_DIRS})
 
 if (vtkSegmentationCore_USE_UUID)
   # In order to use UUIDs for segment IDs, we need to link against the gdcmMSFF library
   # for gdcm::UIDGenerator.
-  vtk_module_link(Slicer::SegmentationCore PUBLIC gdcmMSFF)
+  vtk_module_link(Slicer::SegmentationCore PRIVATE gdcmMSFF)
 endif()

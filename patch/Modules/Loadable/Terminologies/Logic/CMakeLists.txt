@@ -20,4 +20,4 @@ vtk_module_add_module(Slicer::TerminologiesModuleLogic
   HEADERS ${wrapper_header_file}
 )
 
-vtk_module_link(Slicer::TerminologiesModuleLogic PUBLIC RapidJSON)
+vtk_module_link(Slicer::TerminologiesModuleLogic PRIVATE RapidJSON)
