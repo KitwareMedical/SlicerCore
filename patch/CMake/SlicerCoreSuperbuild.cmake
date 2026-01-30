@@ -1,8 +1,8 @@
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
 # We need to normalize paths because CMake on Windows gives us paths with backslashes
 # ExternalProject cache files contain `set("some\path")` which is badly interpreted...
 cmake_path(CONVERT ${Python3_EXECUTABLE} TO_CMAKE_PATH_LIST Python3_EXECUTABLE NORMALIZE)
-cmake_path(CONVERT ${Python3_LIBRARIES} TO_CMAKE_PATH_LIST Python3_LIBRARIES NORMALIZE)
+#cmake_path(CONVERT ${Python3_LIBRARIES} TO_CMAKE_PATH_LIST Python3_LIBRARIES NORMALIZE)
 cmake_path(CONVERT ${Python3_INCLUDE_DIR} TO_CMAKE_PATH_LIST Python3_INCLUDE_DIR NORMALIZE)
 
 if(UNIX AND NOT APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
