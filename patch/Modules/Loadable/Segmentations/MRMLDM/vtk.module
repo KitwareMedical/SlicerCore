@@ -1,0 +1,11 @@
+NAME
+  Slicer::SegmentationsModuleMRMLDisplayableManager
+LIBRARY_NAME
+  vtkSlicerSegmentationsModuleMRMLDisplayableManager
+IMPLEMENTABLE
+DEPENDS
+  Slicer::SegmentationsModuleMRML
+  VTK::RenderingOpenGL2
+  VTK::RenderingVolumeOpenGL2
+DESCRIPTION
+  "vtkSlicerSegmentationsModuleMRMLDisplayableManager"

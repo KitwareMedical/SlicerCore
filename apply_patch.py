@@ -9,7 +9,7 @@ Usage:
 """
 
 GIT_URL = "https://github.com/Slicer/Slicer.git"
-GIT_REVISION = "896a0b2df23c4db86b11ff5797fdbbb38c7deb8b"
+GIT_REVISION = "8e556d8e1a20aa3d7af6a7f42d5ee669922c6d58"
 
 import argparse
 import os

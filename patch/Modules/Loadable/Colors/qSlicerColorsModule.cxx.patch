@@ -1,0 +1,15 @@
+diff --git a/Modules/Loadable/Colors/qSlicerColorsModule.cxx b/Modules/Loadable/Colors/qSlicerColorsModule.cxx
+index 2d11d99a5e..7e2548f08a 100644
+--- a/Modules/Loadable/Colors/qSlicerColorsModule.cxx
++++ b/Modules/Loadable/Colors/qSlicerColorsModule.cxx
+@@ -48,10 +48,6 @@
+ #include "qSlicerSubjectHierarchyPluginHandler.h"
+ #include "qSlicerSubjectHierarchyColorLegendPlugin.h"
+ 
+-// DisplayableManager initialization
+-#include <vtkAutoInit.h>
+-VTK_MODULE_INIT(vtkSlicerColorsModuleMRMLDisplayableManager)
+-
+ //-----------------------------------------------------------------------------
+ class qSlicerColorsModulePrivate
+ {

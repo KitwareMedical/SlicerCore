@@ -1,0 +1,16 @@
+diff --git a/Modules/Loadable/VolumeRendering/MRMLDM/vtkMRMLVolumeRenderingDisplayableManager.cxx b/Modules/Loadable/VolumeRendering/MRMLDM/vtkMRMLVolumeRenderingDisplayableManager.cxx
+index 257c324b2c..dbd9c3770c 100644
+--- a/Modules/Loadable/VolumeRendering/MRMLDM/vtkMRMLVolumeRenderingDisplayableManager.cxx
++++ b/Modules/Loadable/VolumeRendering/MRMLDM/vtkMRMLVolumeRenderingDisplayableManager.cxx
+@@ -87,11 +87,6 @@
+ #include <vtkTrivialProducer.h>   //TODO: Used for workaround. Remove when fixed
+ #include <vtkPiecewiseFunction.h> //TODO: Used for workaround. Remove when fixed
+ 
+-// Register VTK object factory overrides
+-#include <vtkAutoInit.h>
+-VTK_MODULE_INIT(vtkRenderingContextOpenGL2);
+-VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
+-
+ //---------------------------------------------------------------------------
+ vtkStandardNewMacro(vtkMRMLVolumeRenderingDisplayableManager);
+ 

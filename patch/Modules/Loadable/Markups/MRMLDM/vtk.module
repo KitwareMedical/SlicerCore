@@ -1,0 +1,12 @@
+NAME
+  Slicer::MarkupsModuleMRMLDisplayableManager
+LIBRARY_NAME
+  vtkSlicerMarkupsModuleMRMLDisplayableManager
+IMPLEMENTABLE
+DEPENDS
+  Slicer::MarkupsModuleLogic
+  Slicer::MarkupsModuleMRML
+  Slicer::MarkupsModuleVTKWidgets
+  Slicer::MRMLDisplayableManager
+DESCRIPTION
+  "vtkSlicerMarkupsModuleMRMLDisplayableManager"

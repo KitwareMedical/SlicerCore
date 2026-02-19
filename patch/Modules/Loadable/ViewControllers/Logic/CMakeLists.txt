@@ -1,0 +1,12 @@
+set(classes vtkSlicerViewControllersLogic)
+
+slicercore_generate_module_wrapper(
+  HEADER_NAME "vtkSlicerViewControllersModuleLogicExport.h"
+  OUTPUT_VAR wrapper_header_file
+)
+
+vtk_module_add_module(Slicer::ViewControllersModuleLogic
+  EXPORT_MACRO_PREFIX VTK_SLICER_VIEWCONTROLLERS_MODULE_LOGIC
+  CLASSES ${classes}
+  HEADERS ${wrapper_header_file}
+)
