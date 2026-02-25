@@ -1,4 +1,5 @@
 name: build-wheels
+description: Build Slicer Core and Slicer Core SDK
 
 on:
   workflow_call:
@@ -52,11 +53,6 @@ jobs:
         vtk==${{ inputs.vtk-tag }}
         
         python set_vtk_version ${{ inputs.vtk-tag }}
-      CIBW_ENVIRONMENT: >-
-        CCACHE_DIR=/host/.cache/ccache
-        CCACHE_CONFIGPATH=/host/.config/ccache/ccache.conf
-        CMAKE_C_COMPILER_LAUNCHER=ccache
-        CMAKE_CXX_COMPILER_LAUNCHER=ccache
       # Do not repair, everything is already put just as needed to make it work
       # SlicerCore uses extensive CMake logic to package everything as needed, do not try this at home!
       CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
@@ -81,13 +77,21 @@ jobs:
     - name: Apply patch
       run: python apply_patch.py
 
-    - name: ccache install
-      if: ${{ inputs.os == 'ubuntu-latest' }}
+    - name: Install ccache (Linux)
+      if: runner.os == 'Linux' && inputs.use-cache
       run: sudo apt-get update && sudo apt-get install -y ccache
+
+    - name: Install ccache (macOS)
+      if: runner.os == 'macOS' && inputs.use-cache
+      run: brew install ccache
+
+    - name: Install ccache (Windows)
+      if: runner.os == 'Windows' && inputs.use-cache
+      run: winget install ccache
 
     - name: Restore ccache
       # Only run if use-cache input is true
-      if: ${{ inputs.use-cache }}
+      if: inputs.use-cache
       uses: actions/cache/restore@v4
       with:
         path: ~/.cache/ccache
@@ -96,10 +100,13 @@ jobs:
           ccache-${{ inputs.os }}-
 
     - name: ccache config
+      if: inputs.use-cache
       run: |
-        ccache --set-config=max_size=256Mi
-        ccache --set-config=compression=true
-        ccache --show-config
+        ccache --set-config=max_size=256Mi && ccache --set-config=compression=true
+        echo "CIBW_ENVIRONMENT=CCACHE_DIR=/host/.cache/ccache \
+          CCACHE_CONFIGPATH=/host/.config/ccache/ccache.conf \
+          CMAKE_C_COMPILER_LAUNCHER=ccache \
+          CMAKE_CXX_COMPILER_LAUNCHER=ccache" >> $GITHUB_ENV
 
     - name: Build wheel
       uses: pypa/cibuildwheel@v3.3.1
@@ -108,6 +115,7 @@ jobs:
         output-dir: wheelhouse
 
     - name: ccache stats (after Runtime build)
+      if: ${{ inputs.use-cache }}
       run: ccache -s -v
 
     - name: Upload wheel
@@ -123,6 +131,7 @@ jobs:
         output-dir: wheelhouse
 
     - name: ccache stats (after SDK build)
+      if: ${{ inputs.use-cache }}
       run: ccache -s -v
 
     - name: Upload wheel SDK
@@ -136,6 +145,8 @@ jobs:
         sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev
         python -m pip install virtualenv pytest
         python -m pytest --local-wheels=wheelhouse --verbose Slicer/SlicerCoreSDK
+
+    # - name: Upload to PyPi if enabled
 
     - name: Save ccache
       uses: actions/cache/save@v4

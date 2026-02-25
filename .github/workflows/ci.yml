@@ -5,12 +5,11 @@ on:
     branches:  [ main ]
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
+  build-test:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-15]
         vtk-tag: ['9.6.0'] # pyproject enforces this specific version
         python-version: ['3.10']
         include:
@@ -27,13 +26,12 @@ jobs:
           - os: macos-15
             platform-tag: macosx_arm64
             wheel-tag: macosx_11_0_arm64
-    steps:
-      - uses: ./.github/workflows/build-wheels.yml
-        with:
-          # Map the matrix variables to the reusable workflow's inputs
-          os: ${{ matrix.os }}
-          vtk-tag: ${{ matrix.vtk-tag }}
-          python-version: ${{ matrix.python-version }}
-          build-target: ${{ matrix.cp-tag }}-${{ matrix.platform-tag }}
-          wheel-tag: ${{ matrix.wheel-tag }}
-          use-cache: true
+    uses: ./.github/workflows/build-wheels.yml
+    with:
+      # Map the matrix variables to the reusable workflow's inputs
+      os: ${{ matrix.os }}
+      vtk-tag: ${{ matrix.vtk-tag }}
+      python-version: ${{ matrix.python-version }}
+      build-target: ${{ matrix.cp-tag }}-${{ matrix.platform-tag }}
+      wheel-tag: ${{ matrix.wheel-tag }}
+      use-cache: true
