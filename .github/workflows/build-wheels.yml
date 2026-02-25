@@ -1,0 +1,146 @@
+name: build-wheels
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: 'The operating system to run the job on'
+        required: true
+        type: string
+      vtk-tag:
+        description: 'VTK version to use, must match the one in pyproject.toml'
+        required: true
+        type: string
+      python-version:
+        description: 'Python version to set up (e.g., 3.10)'
+        required: true
+        type: string
+      build-target:
+        description: 'CIBW build target (e.g., cp310-manylinux_x86_64)'
+        required: true
+        type: string
+      wheel-tag:
+        description: 'Wheel tag to apply after building. Ignored on Windows.'
+        required: true
+        type: string
+      use-cache:
+        required: false
+        type: boolean
+        default: true
+        description: 'Enable or disable ccache restoration and saving'
+
+jobs:
+  test:
+    runs-on: ${{ inputs.os }}
+    
+    env:
+      CIBW_BUILD: ${{ inputs.build-target }}
+      # cibuildwheel creates a docker container for building our wheel
+      # This is all the required steps to use host ccache correctly
+      CIBW_CONTAINER_ENGINE: "docker; create_args: --volume /home/runner/.cache/ccache:/host/.cache/ccache --volume /home/runner/.config/ccache:/host/.config/ccache"
+      # Install a compiler cache on each platform
+      CIBW_BEFORE_ALL_LINUX: yum install -y ccache && ccache --show-config && ccache -z
+      CIBW_BEFORE_ALL_MACOS: brew install ccache && ccache --show-config && ccache -z
+      CIBW_BEFORE_ALL_WINDOWS: winget install ccache && ccache --show-config && ccache -z
+      CIBW_BUILD_FRONTEND: "pip; args: --no-build-isolation"
+      CIBW_BEFORE_BUILD: pip install
+        --extra-index-url https://wheels.vtk.org
+        --extra-index-url https://vtk.org/files/wheel-sdks
+        scikit-build-core
+        vtk-sdk-python-wheel-helper
+        vtk-sdk==${{ inputs.vtk-tag }}
+        vtk==${{ inputs.vtk-tag }}
+        
+        python set_vtk_version ${{ inputs.vtk-tag }}
+      CIBW_ENVIRONMENT: >-
+        CCACHE_DIR=/host/.cache/ccache
+        CCACHE_CONFIGPATH=/host/.config/ccache/ccache.conf
+        CMAKE_C_COMPILER_LAUNCHER=ccache
+        CMAKE_CXX_COMPILER_LAUNCHER=ccache
+      # Do not repair, everything is already put just as needed to make it work
+      # SlicerCore uses extensive CMake logic to package everything as needed, do not try this at home!
+      CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
+        python -m pip install wheel &&
+        python -m wheel tags --platform-tag ${{ inputs.wheel-tag }} --remove {wheel} &&
+        cp $(dirname {wheel})/slicer_core*.whl {dest_dir}
+      CIBW_REPAIR_WHEEL_COMMAND_MACOS: >
+        python -m pip install wheel &&
+        python -m wheel tags --platform-tag ${{ inputs.wheel-tag }} --remove {wheel} &&
+        cp $(dirname {wheel})/slicer_core*.whl {dest_dir}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: 'pip'
+        cache-dependency-path: 'pyproject.toml'
+
+    - name: Apply patch
+      run: python apply_patch.py
+
+    - name: ccache install
+      if: ${{ inputs.os == 'ubuntu-latest' }}
+      run: sudo apt-get update && sudo apt-get install -y ccache
+
+    - name: Restore ccache
+      # Only run if use-cache input is true
+      if: ${{ inputs.use-cache }}
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/ccache
+        key: ccache-${{ inputs.os }}-${{ github.run_id }}
+        restore-keys: |
+          ccache-${{ inputs.os }}-
+
+    - name: ccache config
+      run: |
+        ccache --set-config=max_size=256Mi
+        ccache --set-config=compression=true
+        ccache --show-config
+
+    - name: Build wheel
+      uses: pypa/cibuildwheel@v3.3.1
+      with:
+        package-dir: Slicer
+        output-dir: wheelhouse
+
+    - name: ccache stats (after Runtime build)
+      run: ccache -s -v
+
+    - name: Upload wheel
+      uses: actions/upload-artifact@v4
+      with:
+        name: slicer-core-${{ inputs.python-version }}-${{ inputs.build-target }}
+        path: wheelhouse/slicer_core-*.whl
+
+    - name: Build wheel SDK
+      uses: pypa/cibuildwheel@v3.3.1
+      with:
+        package-dir: Slicer/SlicerCoreSDK
+        output-dir: wheelhouse
+
+    - name: ccache stats (after SDK build)
+      run: ccache -s -v
+
+    - name: Upload wheel SDK
+      uses: actions/upload-artifact@v4
+      with:
+        name: slicer-core-sdk-${{ inputs.python-version }}-${{ inputs.build-target }}
+        path: wheelhouse/slicer_core_sdk-*.whl
+
+    - name: Test
+      run: |
+        sudo apt-get install mesa-common-dev mesa-utils freeglut3-dev
+        python -m pip install virtualenv pytest
+        python -m pytest --local-wheels=wheelhouse --verbose Slicer/SlicerCoreSDK
+
+    - name: Save ccache
+      uses: actions/cache/save@v4
+      # We want the cache to be updated regardless of success, but ONLY if caching is enabled
+      if: ${{ always() && inputs.use-cache }}
+      with:
+        path: ~/.cache/ccache
+        key: ccache-${{ inputs.os }}-${{ github.run_id }}
