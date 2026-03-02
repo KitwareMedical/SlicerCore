@@ -124,7 +124,6 @@ set(dependencies
   ITK
   JsonCpp
   LibArchive
-  ParameterSerializer
   RapidJSON
   SlicerExecutionModel
   tbb
