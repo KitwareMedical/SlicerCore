@@ -4,6 +4,7 @@ LIBRARY_NAME
   vtkSlicerBaseLogic
 DEPENDS
   VTK::ImagingGeneral
+  VTK::WrappingPythonCore
   Slicer::MRMLDisplayableManager
   Slicer::MRMLLogic
   Slicer::RemoteIO
