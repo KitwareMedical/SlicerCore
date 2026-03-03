@@ -54,7 +54,7 @@ jobs:
       # Use no build isolation so ccache can hit correctly since vtk-sdk will always be in the same logical directory
       CIBW_BUILD_FRONTEND: "pip; args: --no-build-isolation"
       # And as we use --no-build-isolation, let's install the dependencies manually
-      CIBW_BEFORE_BUILD: "pip install scikit-build-core vtk-sdk-python-wheel-helper
+      CIBW_BEFORE_BUILD: "pip install scikit-build-core vtk-sdk-python-wheel-helper cmake ninja
         vtk-sdk==${{ inputs.vtk-tag }}
         --extra-index-url https://vtk.org/files/wheel-sdks
         vtk==${{ inputs.vtk-tag }}
