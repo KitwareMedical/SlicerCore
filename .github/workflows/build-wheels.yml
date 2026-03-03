@@ -74,7 +74,7 @@ jobs:
     - name: ccache config (Windows)
       if: runner.os == 'Windows' && inputs.use-cache
       run: |
-        ccache --set-config=max_size=1Gi && ccache --set-config=compression=true
+        ccache --set-config=max_size=768Mi && ccache --set-config=compression=true
         "CMAKE_C_COMPILER_LAUNCHER=ccache" | Out-File -FilePath $env:GITHUB_ENV -Append
         "CMAKE_CXX_COMPILER_LAUNCHER=ccache" | Out-File -FilePath $env:GITHUB_ENV -Append
 
@@ -82,7 +82,7 @@ jobs:
       if: runner.os == 'macOS' && inputs.use-cache
       run: |
         brew install ccache
-        ccache --set-config=max_size=1Gi && ccache --set-config=compression=true
+        ccache --set-config=max_size=768Mi && ccache --set-config=compression=true
         echo "CMAKE_C_COMPILER_LAUNCHER=ccache" >> $GITHUB_ENV
         echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache" >> $GITHUB_ENV
 
@@ -90,7 +90,7 @@ jobs:
       if: runner.os == 'Linux' && inputs.use-cache
       run: |
         sudo apt-get update && sudo apt-get install -y ccache
-        ccache --set-config=max_size=1Gi && ccache --set-config=compression=true
+        ccache --set-config=max_size=512Mi && ccache --set-config=compression=true
         echo "CIBW_ENVIRONMENT=CCACHE_DIR=/host/.cache/ccache \
         CCACHE_CONFIGPATH=/host/.config/ccache/ccache.conf \
         CMAKE_C_COMPILER_LAUNCHER=ccache \
