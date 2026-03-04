@@ -212,3 +212,18 @@ jobs:
           ~/Library/Caches/ccache
           C:\Users\runneradmin\AppData\Local\Mozilla\sccache\cache
         key: ccache-${{ inputs.os }}-${{ github.run_id }}
+
+    - name: Upload wheel test artifact on failure
+      if: failure() && runner.os != 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: slicer_core-${{ matrix.os }}
+        path:
+          /tmp/test_wheelhouse/*
+
+    - name: Upload wheel test artifact on failure (Windows)
+      if: failure() && runner.os == 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: slicer_core-${{ matrix.os }}
+        path: $env:TEMP/test_wheelhouse/*
