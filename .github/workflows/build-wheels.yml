@@ -137,7 +137,7 @@ jobs:
       if: ${{ !inputs.dry-run }}
       uses: pypa/cibuildwheel@v3.3.1
       env:
-        CIBW_TEST_COMMAND: "python -m pytest {package} --local-wheels={project}/wheelhouse -m runtime --verbose"
+        CIBW_TEST_COMMAND: "python -m pytest {package} --local-wheels={dest_dir} -m runtime --verbose"
       with:
         package-dir: Slicer/SlicerCore
         output-dir: wheelhouse
@@ -170,7 +170,7 @@ jobs:
       if: ${{ !inputs.dry-run }}
       uses: pypa/cibuildwheel@v3.3.1
       env:
-        CIBW_TEST_COMMAND: "python -m pytest {package} --local-wheels={project}/wheelhouse -m sdk --verbose"
+        CIBW_TEST_COMMAND: "python -m pytest {package} --local-wheels={dest_dir} -m sdk --verbose"
       with:
         package-dir: Slicer/SlicerCoreSDK
         output-dir: wheelhouse
