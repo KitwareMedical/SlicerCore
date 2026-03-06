@@ -54,7 +54,7 @@ jobs:
       # Install a compiler cache on each platform
       CIBW_BEFORE_ALL_LINUX: "yum install -y ccache mesa-libGL-devel glx-utils freeglut-devel && ccache --show-config && ccache -z"
       CIBW_BEFORE_ALL_MACOS: "ccache --show-config && ccache -z"
-      CIBW_BEFORE_ALL_WINDOWS: "sccache -z"
+      CIBW_BEFORE_ALL_WINDOWS: "sccache -z && mkdir %TEMP%\\test_wheelhouse && copy .\\README.md %TEMP%\\test_wheelhouse"
       # Use no build isolation so ccache can hit correctly since vtk-sdk will always be in the same logical directory
       CIBW_BUILD_FRONTEND: "pip; args: --no-build-isolation"
       # And as we use --no-build-isolation, let's install the dependencies manually
@@ -84,10 +84,7 @@ jobs:
         cp $(dirname {wheel})/slicer_core*.whl {dest_dir} &&
         mkdir -p /tmp/test_wheelhouse &&
         cp $(dirname {wheel})/slicer_core*.whl /tmp/test_wheelhouse"
-      CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "
-        cp ${wheel} {dest_dir} &&
-        mkdir -p $env:TEMP/test_wheelhouse &&
-        cp ${wheel} $env:TEMP/test_wheelhouse"
+      CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "cp {wheel} {dest_dir} && mkdir %TEMP%\\test_wheelhouse && copy {wheel} %TEMP%\\test_wheelhouse"
 
     steps:
     # Install and setup ccache on host
