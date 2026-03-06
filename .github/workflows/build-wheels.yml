@@ -16,6 +16,10 @@ on:
         description: 'CIBW build target (e.g., cp310-manylinux_x86_64)'
         required: true
         type: string
+      python-version:
+        description: 'CIBW build target (e.g., 3.10)'
+        required: true
+        type: string
       platform-tag:
         description: 'Wheel platform tag to apply after building. Ignored on Windows.'
         required: true
@@ -132,7 +136,7 @@ jobs:
       if: ${{ !inputs.dry-run }}
       uses: actions/setup-python@v5
       with:
-        python-version: "3.13"
+        python-version: ${{ inputs.python-version }}
 
     - name: Apply patch
       if: ${{ !inputs.dry-run }}
