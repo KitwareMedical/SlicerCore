@@ -15,23 +15,36 @@ cmake.args = ["-GNinja", "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_SDK=OFF"]
 name = "slicer-core"
 version = "5.11.0.1"
 dependencies = ["vtk==9.6.0"]
-description = "3DSlicer Core libraries as a python standalone project"
-authors = [
-  { name = "Alexy Pellegrini", email = "alexy.pellegrini@kitware.com" },
-]
 requires-python = ">=3.10"
 readme = "README.md"
 license = { text = "Apache 2.0 License" }
 keywords = ["Python", "VTK", "ITK", "3DSlicer", "Slicer", "Medical"]
+description = "3DSlicer Core libraries as a python standalone project"
+authors = [
+  { name = "Kitware Europe", email = "kitware@kitware.eu" },
+  { name = "Alexy Pellegrini", email = "alexy.pellegrini@kitware.com" },
+]
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
+  "Natural Language :: English",
+  "Programming Language :: Python",
+  "Programming Language :: C++",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Healthcare Industry",
+  "Intended Audience :: Science/Research",
+  "Topic :: Multimedia :: Graphics",
+  "Topic :: Multimedia :: Graphics :: 3D Rendering",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Chemistry",
   "Topic :: Scientific/Engineering :: Information Analysis",
-  "Topic :: Scientific/Engineering :: Medical Science Apps",
+  "Topic :: Scientific/Engineering :: Medical Science Apps.",
+  "Topic :: Scientific/Engineering :: Physics",
   "Topic :: Scientific/Engineering :: Visualization",
   "Topic :: Software Development :: Libraries",
-  "Natural Language :: English",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS"
 ]
 [project.optional-dependencies]
 test = ["pytest", "virtualenv"]
