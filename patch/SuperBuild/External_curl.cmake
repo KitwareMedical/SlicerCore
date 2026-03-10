@@ -109,19 +109,7 @@ if((NOT DEFINED CURL_INCLUDE_DIR
 
   ExternalProject_GenerateProjectDescription_Step(${proj})
 
-  if(UNIX)
-    set(curl_IMPORT_SUFFIX .a)
-    if(APPLE)
-      set(curl_IMPORT_SUFFIX .a)
-    endif()
-  elseif(WIN32)
-    set(curl_IMPORT_SUFFIX .lib)
-  else()
-    message(FATAL_ERROR "Unknown system !")
-  endif()
-
-  set(CURL_INCLUDE_DIR "${EP_INSTALL_DIR}/include")
-  set(CURL_LIBRARY "${EP_INSTALL_DIR}/lib/libcurl${curl_IMPORT_SUFFIX}")
+  set(CURL_DIR "${EP_INSTALL_DIR}/lib/cmake/CURL")
 
 else()
   ExternalProject_Add_Empty(${proj} DEPENDS ${${proj}_DEPENDENCIES})
@@ -129,8 +117,7 @@ endif()
 
 mark_as_superbuild(
   VARS
-    CURL_INCLUDE_DIR:PATH
-    CURL_LIBRARY:FILEPATH
+    CURL_DIR:PATH
   LABELS "FIND_PACKAGE"
   )
 

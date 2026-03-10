@@ -42,8 +42,7 @@ vtk_module_add_module(Slicer::RemoteIO
   HEADERS ${wrapper_header_file}
 )
 
-vtk_module_link(Slicer::RemoteIO PUBLIC vtkAddon PRIVATE ${CURL_LIBRARIES}  ZLIB::ZLIB)
-vtk_module_include(Slicer::RemoteIO PRIVATE ${CURL_INCLUDE_DIRS})
+vtk_module_link(Slicer::RemoteIO PUBLIC vtkAddon PRIVATE CURL::libcurl_static ZLIB::ZLIB)
 
 if(WIN32)
   # Define CURL_STATICLIB when linking against static curl on Windows
