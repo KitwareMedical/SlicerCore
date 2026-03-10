@@ -27,5 +27,5 @@ jobs:
       vtk-tag: ${{ matrix.vtk-tag }}
       build-target: ${{ matrix.build-target }}
       platform-tag: ${{ matrix.platform-tag }}
-      macosx-deployment-target: "11.0"
+      python-version: "3.10"
       use-cache: true
