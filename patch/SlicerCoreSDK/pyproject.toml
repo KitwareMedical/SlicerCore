@@ -13,7 +13,7 @@ cmake.args = ["-GNinja", "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_SDK=ON"]
 
 [project]
 name = "slicer-core-sdk"
-version = "5.11.0.3"
+version = "5.11.0.4"
 dependencies = ["vtk==9.6.0"]
 requires-python = ">=3.10"
 description = "3DSlicer Core libraries as a python standalone project"
