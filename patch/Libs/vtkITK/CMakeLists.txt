@@ -53,6 +53,7 @@ configure_file(
 slicercore_generate_module_wrapper(
   HEADER_NAME "vtkITKExport.h"
   OUTPUT_VAR wrapper_header_file
+  ADDITIONAL_INCLUDES "vtkITKConfigure.h"
 )
 
 set(classes

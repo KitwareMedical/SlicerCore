@@ -13,7 +13,7 @@ cmake.args = ["-GNinja", "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_SDK=OFF"]
 
 [project]
 name = "slicer-core"
-version = "5.11.0.4"
+version = "5.11.0.5"
 dependencies = ["vtk==9.6.0"]
 requires-python = ">=3.10"
 readme = "README.md"
