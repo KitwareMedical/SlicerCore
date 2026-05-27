@@ -11,13 +11,13 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
 
   ExternalProject_SetIfNotDefined(
     Slicer_${proj}_GIT_REPOSITORY
-    "${EP_GIT_PROTOCOL}://github.com/AlexyPellegrini/vtkAddon.git"
+    "${EP_GIT_PROTOCOL}://github.com/Slicer/vtkAddon.git"
     QUIET
   )
 
   ExternalProject_SetIfNotDefined(
     Slicer_${proj}_GIT_TAG
-    "python-dev-cmake"
+    "main"
     QUIET
   )
 
@@ -58,6 +58,8 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
       -DCMAKE_INSTALL_PREFIX:PATH=${EP_INSTALL_DIR}
       -DBUILD_SHARED_LIBS:BOOL=ON
       -DBUILD_TESTING:BOOL=OFF
+      -DvtkAddon_INSTALL_INCLUDE_DIR:STRING=include
+      -DvtkAddon_INSTALL_NO_DEVELOPMENT:BOOL=OFF
       -DvtkAddon_USE_UTF8:BOOL=ON
       -DvtkAddon_CMAKE_DIR:PATH=${EP_SOURCE_DIR}/CMake
       -DvtkAddon_LAUNCH_COMMAND:STRING=${Slicer_LAUNCH_COMMAND}
