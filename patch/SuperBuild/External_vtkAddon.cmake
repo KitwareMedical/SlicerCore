@@ -11,18 +11,19 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
 
   ExternalProject_SetIfNotDefined(
     Slicer_${proj}_GIT_REPOSITORY
-    "${EP_GIT_PROTOCOL}://github.com/AlexyPellegrini/vtkAddon.git"
+    "${EP_GIT_PROTOCOL}://github.com/Slicer/vtkAddon.git"
     QUIET
   )
 
   ExternalProject_SetIfNotDefined(
     Slicer_${proj}_GIT_TAG
-    "python-dev-cmake"
+    "main"
     QUIET
   )
 
   set(EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
     "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}"
+    "-DvtkAddon_INSTALL_NO_DEVELOPMENT:BOOL=OFF"
     "-DvtkAddon_WRAP_PYTHON:BOOL=ON"
     "-DPYTHON_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
     "-DPYTHON_INCLUDE_DIRS:PATH=${Python3_INCLUDE_DIR}"
@@ -65,6 +66,7 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
       "-DCMAKE_INSTALL_RPATH:STRING=${install_rpath}"
       -DVTK_WRAP_PYTHON_FIND_LIBS:BOOL=OFF
       -DVTK_DIR:PATH=${VTK_DIR}
+      -DVTK_UNDEFINED_SYMBOLS_ALLOWED:BOOL=ON
       ${EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
@@ -72,7 +74,7 @@ if(NOT DEFINED vtkAddon_DIR AND NOT Slicer_USE_SYSTEM_${proj})
 
   ExternalProject_GenerateProjectDescription_Step(${proj})
 
-  set(vtkAddon_DIR ${EP_INSTALL_DIR}/lib/CMake/vtkAddon)
+  set(vtkAddon_DIR ${EP_INSTALL_DIR}/vtkAddon/lib/cmake/vtkAddon)
   set(vtkAddon_PYTHON_DIR "${EP_INSTALL_DIR}/${python_destination}")
 
   # Add path to SlicerLauncherSettings.ini
