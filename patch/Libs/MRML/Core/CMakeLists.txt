@@ -108,6 +108,7 @@ set(classes
   vtkDataIOManager
   vtkDataTransfer
   vtkEventBroker
+  vtkImageMapToWindowLevelAddon
   vtkImageMathematicsAddon
   vtkImplicitInvertableBoolean
   vtkMRMLAbstractLayoutNode
