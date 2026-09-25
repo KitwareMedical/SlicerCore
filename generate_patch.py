@@ -124,5 +124,5 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        print(f"Error occured while generation patch:\n{e}")
+        print(f"Error occured while generating patch:\n{e}")
         exit(1)

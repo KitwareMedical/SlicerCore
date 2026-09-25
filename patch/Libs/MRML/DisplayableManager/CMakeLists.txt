@@ -40,6 +40,7 @@ set(classes
   vtkMRMLVolumeGlyphSliceDisplayableManager
 
   # DisplayableManager common between ThreeDView and SliceView
+  vtkMRMLAccuratePicker
   vtkMRMLOrientationMarkerDisplayableManager
   vtkMRMLRulerDisplayableManager
   vtkMRMLScalarBarDisplayableManager
