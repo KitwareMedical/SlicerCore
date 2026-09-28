@@ -3,7 +3,7 @@ requires = [
   "scikit-build-core",
   "vtk-sdk-python-wheel-helper",
   "slicer-core-sdk",
-  "vtk-sdk==9.6.0"
+  "vtk-sdk==9.6.2"
 ]
 build-backend = "scikit_build_core.build"
 
